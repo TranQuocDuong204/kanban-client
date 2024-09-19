@@ -8,7 +8,7 @@ import replaceName from "@/utils/replaceName";
 import { toast } from "react-toastify";
 import axios from "axios";
 const { Paragraph } = Typography;
-const AddSupplier = ({ visible, onClose }) => {
+const AddSupplier = ({ visible, onClose, onAddNew }) => {
   const [isTasking, setIsTasking] = useState(false);
   const [file, setFile] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ const AddSupplier = ({ visible, onClose }) => {
   };
   const addNewSupplier = async (value) => {
     setIsLoading(true);
-    const api = "http://localhost:8080/v1/supplier/";
+    const api = "http://localhost:8080/v1/supplier/create-new";
     const data = {};
     for (const i in value) {
       data[i] = value[i] ?? "";
@@ -44,9 +44,12 @@ const AddSupplier = ({ visible, onClose }) => {
     data.slug = replaceName(data.name);
     data.categories = categories;
     try {
+      // eslint-disable-next-line no-unused-vars
       const result = await axios.post(api, data, {
         headers: { "Content-Type": "application/json" },
       });
+      const newData = await result.data.data.getOneSupplier;
+      onAddNew(newData);
       handleClose();
       toast.success("🦄 Wow so easy!", {
         position: "top-center",
