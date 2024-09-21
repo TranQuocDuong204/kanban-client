@@ -1,20 +1,21 @@
 /* eslint-disable react/prop-types */
 import { UserOutlined } from "@ant-design/icons";
 import { Form, Modal, Input, Select, Button, Avatar } from "antd";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Typography } from "antd";
 import uploadFile from "@/utils/uploadFile";
 import replaceName from "@/utils/replaceName";
 import { toast } from "react-toastify";
 import axios from "axios";
 const { Paragraph } = Typography;
-const AddSupplier = ({ visible, onClose, onAddNew }) => {
+const AddSupplier = ({ visible, onClose, onAddNew, supplier }) => {
   const [isTasking, setIsTasking] = useState(false);
   const [file, setFile] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [form] = Form.useForm();
   const inputRef = useRef();
+
   const options = [];
   for (let i = 10; i < 36; i++) {
     options.push({
@@ -28,6 +29,7 @@ const AddSupplier = ({ visible, onClose, onAddNew }) => {
   const addNewSupplier = async (value) => {
     setIsLoading(true);
     const api = "http://localhost:8080/v1/supplier/create-new";
+    const apiUp = "http://localhost:8080/v1/supplier/update";
     const data = {};
     for (const i in value) {
       data[i] = value[i] ?? "";
@@ -36,7 +38,6 @@ const AddSupplier = ({ visible, onClose, onAddNew }) => {
     data.price = value.price ? parseInt(value.price) : 0;
     data.contact = value.contact ? parseInt(value.contact) : 0;
     data.isTasking = isTasking ? 1 : 0;
-    console.log(typeof data.isTasking);
 
     if (file) {
       data.photoUrl = await uploadFile(file);
@@ -44,23 +45,41 @@ const AddSupplier = ({ visible, onClose, onAddNew }) => {
     data.slug = replaceName(data.name);
     data.categories = categories;
     try {
-      // eslint-disable-next-line no-unused-vars
-      const result = await axios.post(api, data, {
-        headers: { "Content-Type": "application/json" },
-      });
-      const newData = await result.data.data.getOneSupplier;
-      onAddNew(newData);
-      handleClose();
-      toast.success("🦄 Wow so easy!", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      if (supplier) {
+        const result = await axios.put(`${apiUp}?id=${supplier?._id}`, data, {
+          headers: { "Content-Type": "application/json" },
+        });
+        // eslint-disable-next-line no-unused-vars
+        const dataUp = await result.data.data;
+        handleClose();
+        toast.success("🦄Update success!", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } else {
+        const result = await axios.post(api, data, {
+          headers: { "Content-Type": "application/json" },
+        });
+        const newData = await result.data.data.getOneSupplier;
+        onAddNew(newData);
+        handleClose();
+        toast.success("🦄 Create new success!", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -71,8 +90,16 @@ const AddSupplier = ({ visible, onClose, onAddNew }) => {
   const handleClose = () => {
     form.resetFields();
     setFile(undefined);
+    setCategories([]);
     onClose();
   };
+
+  useEffect(() => {
+    if (supplier) {
+      form.setFieldsValue(supplier);
+    }
+    setIsTasking(supplier?.isTasking === 1 ? true : false);
+  }, [supplier]);
 
   return (
     <div>
@@ -82,8 +109,8 @@ const AddSupplier = ({ visible, onClose, onAddNew }) => {
         onClose={handleClose}
         onCancel={handleClose}
         onOk={() => form.submit()}
-        title="Add Supplier"
-        okText="Add Supplier"
+        title={supplier ? "Update Supplier" : "Add Supplier"}
+        okText={supplier ? "Update Supplier" : "Add Supplier"}
         cancelText="Discard"
       >
         <div className=" hidden">
@@ -98,6 +125,8 @@ const AddSupplier = ({ visible, onClose, onAddNew }) => {
         <label htmlFor="inpFile" className=" flex justify-center pb-2">
           {file ? (
             <Avatar size={60} src={URL.createObjectURL(file)} />
+          ) : supplier ? (
+            <Avatar size={60} src={supplier?.photoUrl} />
           ) : (
             <Avatar
               size={60}
