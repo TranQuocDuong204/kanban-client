@@ -1,12 +1,33 @@
-import { Input, Layout } from "antd";
+import { Dropdown, Input, Layout } from "antd";
 import { SearchOutlined, BellOutlined } from "@ant-design/icons";
 import { Avatar, Space } from "antd";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { removeAuth } from "@/redux/reducers/AuthReducers";
+import auth from "@/firebase/configFirebase";
+import { signOut } from "firebase/auth";
 const { Header } = Layout;
 const styleHeader = {
   backgroundColor: "#fff",
-  borderLeft: "1px solid #ddd"
+  borderLeft: "1px solid #ddd",
 };
+
 const HeaderComponent = () => {
+  const user = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const items = [
+    {
+      key: "logout",
+      label: "Đăng xuất",
+      onClick: async () => {
+         signOut(auth);
+        dispatch(removeAuth({}));
+        navigate("/");
+      },
+    },
+  ];
   return (
     <Header style={styleHeader}>
       <div className="flex justify-between">
@@ -24,15 +45,12 @@ const HeaderComponent = () => {
           <div className="flex items-center gap-2">
             {" "}
             <BellOutlined style={{ fontSize: 20 }} />
-            <Avatar
-              size="large"
-              src={
-                <img
-                  src="https://tse2.mm.bing.net/th?id=OIP.mmdMlUuwQq2nwN3TsHs3BwHaFR&pid=Api&P=0&h=180"
-                  alt="avatar"
-                />
-              }
-            />
+            <Dropdown menu={{ items }}>
+              <Avatar
+                size="large"
+                src={<img src={user.photoUrl} alt="avatar" />}
+              />
+            </Dropdown>
           </div>
         </Space>
       </div>

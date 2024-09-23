@@ -8,9 +8,9 @@ import { addAuth } from "@/redux/reducers/AuthReducers";
 const provider = new GoogleAuthProvider();
 
 provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
-provider.setCustomParameters({
-  login_hint: "tranquocduong311ts@gmail.com",
-});
+// provider.setCustomParameters({
+//   login_hint: "tranquocduong2004vta@gmail.com",
+// });
 
 const SocialLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,10 +24,13 @@ const SocialLogin = () => {
       console.log("Sign-in result:", result);
       if (result) {
         const user = result.user;
+        console.log(user);
+
         if (user) {
           const data = {
             name: user.displayName,
             email: user.email,
+            photoUrl: user?.photoURL,
           };
           try {
             const result = await axios.post(
@@ -40,8 +43,8 @@ const SocialLogin = () => {
                 },
               }
             );
-            if(result.data.data) {
-              dispatch(addAuth(result.data.data))
+            if (result.data.data) {
+              dispatch(addAuth(result.data.data));
             }
             console.log(result);
           } catch (e) {

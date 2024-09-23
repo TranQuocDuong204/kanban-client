@@ -185,6 +185,36 @@ const AddSupplier = ({ visible, onClose, onAddNew, supplier }) => {
           >
             <Input placeholder="Enter supplier name" allowClear />
           </Form.Item>
+          <Form.Item
+            label="Supplier Email"
+            name="email"
+            rules={[
+              {
+                type: "email",
+                required: true,
+                message: "Please input your supplier email!",
+              },
+            ]}
+          >
+            <Input placeholder="Enter supplier email" allowClear />
+          </Form.Item>
+
+          <Form.Item
+            label="Active"
+            name="active"
+            rules={[
+              {
+                required: true,
+                message: "Please input your supplier active!",
+              },
+            ]}
+          >
+            <Input
+              type="number"
+              placeholder="Enter supplier active"
+              allowClear
+            />
+          </Form.Item>
 
           <Form.Item
             label="Product"

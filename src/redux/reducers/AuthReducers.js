@@ -3,7 +3,8 @@ const initialState = {
   token: "",
   _id: "",
   name: "",
-  rule: 0
+  rule: 0,
+  photoUrl: ""
 }
 export const authSlice = createSlice({
   name: "auth",
@@ -14,6 +15,7 @@ export const authSlice = createSlice({
       state._id = action.payload._id;
       state.name = action.payload.name;
       state.rule = action.payload.rule;
+      state.photoUrl = action.payload.photoUrl
       localStorage.setItem("auth", JSON.stringify(action.payload))
     },
     // eslint-disable-next-line no-unused-vars

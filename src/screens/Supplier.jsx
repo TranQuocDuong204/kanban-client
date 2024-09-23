@@ -17,15 +17,17 @@ const Supplier = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [supplierSelected, setSupplierSelected] = useState();
-
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPage, setTotalPage] = useState(10);
   const getSuppliers = async () => {
     setIsLoading(true);
-    const api = "http://localhost:8080/v1/supplier/";
+    const api = `http://localhost:8080/v1/supplier?page=${page}&pageSize=${pageSize}`;
     try {
       const results = await axios.get(api);
       const data = await results.data;
-      const { result } = data;
-
+      const { result, total } = data;
+      setTotalPage(total);
       if (result) return setSuppliers(result);
     } catch (error) {
       console.log(error);
@@ -62,10 +64,42 @@ const Supplier = () => {
     }
   };
 
+  // const handleDemoData = () => {
+  //   mockData.forEach(async (item) => {
+  //     const data = {
+  //       name: item.title,
+  //       product: "Video reactjs",
+  //       email: "test@example.com",
+  //       active: 123,
+  //       categories: ["data fake"],
+  //       price: Math.floor(Math.random() * 1000000),
+  //       contact: "12345678",
+  //       isTasking: 0,
+  //       slug: replaceName(item.title),
+  //     };
+  //     const api = "http://localhost:8080/v1/supplier/create-new";
+  //     try {
+  //       const result = await axios.post(api, data, {
+  //         headers: { "Content-Type": "application/json" },
+  //       });
+  //       console.log("add mock data success");
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   });
+  // };
+
   useEffect(() => {
     getSuppliers();
-  }, []);
+  }, [pageSize, page]);
   const columns = [
+    {
+      key: "#",
+      title: "#",
+      dataIndex: "_id",
+      render: (_, __, index) => index + 1 + (page - 1) * pageSize,
+      align: "center",
+    },
     {
       key: "name",
       title: "Supplier name",
@@ -92,6 +126,7 @@ const Supplier = () => {
       key: "email",
       title: "Email",
       dataIndex: "email",
+      render: (email) => email ?? "email@gmail.com",
     },
     {
       key: "isTasking",
@@ -105,8 +140,9 @@ const Supplier = () => {
     },
     {
       key: "on",
-      dataIndex: "",
+      dataIndex: "active",
       title: "On the way",
+      render: (active) => active ?? "--",
     },
     {
       key: "buttonContainer",
@@ -147,7 +183,21 @@ const Supplier = () => {
   ];
   return (
     <div className="p-3">
+      {/* <Button onClick={handleDemoData}>Addmockdata</Button> */}
       <Table
+        pagination={{
+          showSizeChanger: true,
+          onShowSizeChange: (current, size) => {
+            setPageSize(size);
+          },
+          total: totalPage,
+          onChange: (pages) => {
+            setPage(pages);
+          },
+        }}
+        scroll={{
+          y: "calc(100vh - 280px)",
+        }}
         loading={isLoading}
         dataSource={suppliers}
         columns={columns}

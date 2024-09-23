@@ -1,14 +1,6 @@
-import { removeAuth } from "@/redux/reducers/AuthReducers";
-import { Button } from "antd";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+
 const HomeScreens = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const logout = () => {
-    dispatch(removeAuth({}));
-    navigate("/");
-  };
+
   // const verifyToken = async () => {
   //   // Lấy chuỗi JSON từ localStorage
   //   const tokenString = localStorage.getItem("auth");
@@ -58,7 +50,7 @@ const HomeScreens = () => {
 
   return (
     <div>
-      <Button onClick={logout}>Logout</Button>
+     
     </div>
   );
 };

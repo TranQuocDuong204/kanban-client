@@ -47,7 +47,7 @@ const SiderComponent = () => {
   ];
 
   return (
-    <Sider theme="light" width="20%" style={{ height: "100vh" }}>
+    <Sider theme="light"  style={{ height: "100vh" }}>
       <div className=" flex justify-start items-center gap-2 pl-7 mt-3 mb-4 cursor-pointer">
         <img
           src="https://firebasestorage.googleapis.com/v0/b/kanban-68886.appspot.com/o/Logokanban.png?alt=media&token=9d20b4f0-482d-4a32-b1a5-7b9624fc6d53"

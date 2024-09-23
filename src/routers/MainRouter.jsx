@@ -1,7 +1,7 @@
 import SiderComponent from "@/components/SiderComponent";
 import { Inventory, ManageStore, Order, Report, Supplier } from "@/screens";
 import HomeScreens from "@/screens/HomeScreens";
-import { Layout } from "antd";
+import { Affix, Layout } from "antd";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HeaderComponent from "@/components/HeaderComponent";
 // import FooterComponent from "@/components/FooterComponent";
@@ -10,9 +10,14 @@ const MainRouter = () => {
   return (
     <BrowserRouter>
       <Layout>
-        <SiderComponent />
+        <Affix offsetTop={0}>
+          <SiderComponent />
+        </Affix>
+
         <Layout>
-          <HeaderComponent />
+          <Affix>
+            <HeaderComponent />
+          </Affix>
 
           <Content>
             <Routes>
@@ -24,7 +29,7 @@ const MainRouter = () => {
             </Routes>
           </Content>
           {/* <FooterComponent /> */}
-          <HomeScreens/>
+          <HomeScreens />
         </Layout>
       </Layout>
     </BrowserRouter>
