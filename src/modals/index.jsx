@@ -1,3 +1,3 @@
 import AddSupplier from "./AddSupplier";
-
-export { AddSupplier}
+import ModalExportData from "./ModalExportData";
+export { AddSupplier, ModalExportData };

@@ -1,89 +1,88 @@
 /* eslint-disable react/prop-types */
 import { UserOutlined } from "@ant-design/icons";
-import { Form, Modal, Input, Select, Button, Avatar } from "antd";
+import { Form, Modal, Button, Avatar } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { Typography } from "antd";
 import uploadFile from "@/utils/uploadFile";
 import replaceName from "@/utils/replaceName";
 import { toast } from "react-toastify";
 import axios from "axios";
+import FormItem from "@/components/FormItem";
 const { Paragraph } = Typography;
 const AddSupplier = ({ visible, onClose, onAddNew, supplier }) => {
   const [isTasking, setIsTasking] = useState(false);
   const [file, setFile] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [formData, setFormData] = useState();
   const [form] = Form.useForm();
   const inputRef = useRef();
 
-  const options = [];
-  for (let i = 10; i < 36; i++) {
-    options.push({
-      value: i.toString(36) + i,
-      label: i.toString(36) + i,
-    });
-  }
+  useEffect(() => {
+    if (supplier) {
+      form.setFieldsValue(supplier);
+    }
+    setIsTasking(supplier?.isTasking === 1 ? true : false);
+  }, [supplier]);
+
+  useEffect(() => {
+    getForm();
+  }, []);
+
   const handleAddCategory = (value) => {
     setCategories((prev) => [...prev, value]);
   };
-  const addNewSupplier = async (value) => {
+
+  const submitData = async (api, method, data) => {
     setIsLoading(true);
-    const api = "http://localhost:8080/v1/supplier/create-new";
-    const apiUp = "http://localhost:8080/v1/supplier/update";
-    const data = {};
-    for (const i in value) {
-      data[i] = value[i] ?? "";
-    }
-
-    data.price = value.price ? parseInt(value.price) : 0;
-    data.contact = value.contact ? parseInt(value.contact) : 0;
-    data.isTasking = isTasking ? 1 : 0;
-
-    if (file) {
-      data.photoUrl = await uploadFile(file);
-    }
-    data.slug = replaceName(data.name);
-    data.categories = categories;
     try {
-      if (supplier) {
-        const result = await axios.put(`${apiUp}?id=${supplier?._id}`, data, {
-          headers: { "Content-Type": "application/json" },
-        });
-        // eslint-disable-next-line no-unused-vars
-        const dataUp = await result.data.data;
-        handleClose();
-        toast.success("🦄Update success!", {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      } else {
-        const result = await axios.post(api, data, {
-          headers: { "Content-Type": "application/json" },
-        });
-        const newData = await result.data.data.getOneSupplier;
-        onAddNew(newData);
-        handleClose();
-        toast.success("🦄 Create new success!", {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }
+      const result = await axios({
+        method,
+        url: api,
+        headers: { "Content-Type": "application/json" },
+        data,
+      });
+
+      const newSupplier = await result.data.data;
+      if (!supplier) onAddNew(newSupplier.getOneSupplier);
+      handleClose();
+      toastify(
+        toast.success,
+        supplier ? "Updated successfully" : "Created successfully"
+      );
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+  const addNewSupplier = async (value) => {
+    setIsLoading(true);
+    const apiUrl = supplier
+      ? `http://localhost:8080/v1/supplier/update?id=${supplier._id}`
+      : "http://localhost:8080/v1/supplier/create-new";
+    const method = supplier ? "put" : "post";
+    const data = {
+      ...value,
+      price: parseInt(value.price || 0),
+      contact: parseInt(value.contact || 0),
+      isTasking: isTasking ? 1 : 0,
+      photoUrl: file ? await uploadFile(file) : supplier?.photoUrl,
+      slug: replaceName(value.name),
+      categories,
+    };
+    submitData(apiUrl, method, data);
+  };
+
+  const getForm = async () => {
+    const api = "http://localhost:8080/v1/supplier/get-form";
+    try {
+      const resultGetform = await axios.get(api);
+      const dataForm = await resultGetform.data;
+      const { form } = dataForm;
+      form && setFormData(form);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -94,12 +93,18 @@ const AddSupplier = ({ visible, onClose, onAddNew, supplier }) => {
     onClose();
   };
 
-  useEffect(() => {
-    if (supplier) {
-      form.setFieldsValue(supplier);
-    }
-    setIsTasking(supplier?.isTasking === 1 ? true : false);
-  }, [supplier]);
+  const toastify = (method, message) => {
+    return method(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
 
   return (
     <div>
@@ -159,141 +164,48 @@ const AddSupplier = ({ visible, onClose, onAddNew, supplier }) => {
             </Button>
           </div>
         </label>
-
-        <Form
-          onFinish={addNewSupplier}
-          name="basic"
-          labelCol={{
-            span: 6,
-          }}
-          wrapperCol={{
-            span: 18,
-          }}
-          size="middle"
-          layout="horizontal"
-          form={form}
-        >
-          <Form.Item
-            label="Supplier Name"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Please input your supplier name!",
-              },
-            ]}
+        {formData && (
+          <Form
+            key={formData.key}
+            onFinish={addNewSupplier}
+            name={formData.title}
+            labelCol={{
+              span: formData.labelCol,
+            }}
+            wrapperCol={{
+              span: formData.wrapperCol,
+            }}
+            size={formData.size}
+            layout={formData.layout}
+            form={form}
           >
-            <Input placeholder="Enter supplier name" allowClear />
-          </Form.Item>
-          <Form.Item
-            label="Supplier Email"
-            name="email"
-            rules={[
-              {
-                type: "email",
-                required: true,
-                message: "Please input your supplier email!",
-              },
-            ]}
-          >
-            <Input placeholder="Enter supplier email" allowClear />
-          </Form.Item>
+            {formData.formItem.map((item) => (
+              <FormItem
+                key={item.key}
+                item={item}
+                handleAddCategory={handleAddCategory}
+              />
+            ))}
 
-          <Form.Item
-            label="Active"
-            name="active"
-            rules={[
-              {
-                required: true,
-                message: "Please input your supplier active!",
-              },
-            ]}
-          >
-            <Input
-              type="number"
-              placeholder="Enter supplier active"
-              allowClear
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Product"
-            name="product"
-            rules={[
-              {
-                required: true,
-                message: "Please input your product!",
-              },
-            ]}
-          >
-            <Input placeholder="Enter product" allowClear />
-          </Form.Item>
-
-          <Form.Item
-            label="Categories"
-            name="categories"
-            // rules={[
-            //   {
-            //     required: true,
-            //     message: "Please input your categories!",
-            //   },
-            // ]}
-          >
-            <Select
-              defaultValue=""
-              style={{
-                width: "100%",
-              }}
-              options={options}
-              placeholder="Enter Categories"
-              onChange={handleAddCategory}
-            ></Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Buy Price"
-            name="price"
-            rules={[
-              {
-                required: true,
-                message: "Please input your buy price!",
-              },
-            ]}
-          >
-            <Input placeholder="Enter buy price" type="number" allowClear />
-          </Form.Item>
-
-          <Form.Item
-            label="Contact Number"
-            name="contact"
-            rules={[
-              {
-                required: true,
-                message: "Please input your contact number!",
-              },
-            ]}
-          >
-            <Input placeholder="Enter buy price" type="number" allowClear />
-          </Form.Item>
-
-          <Form.Item label="Type">
-            <div className=" flex gap-2 flex-col w-[45%]">
-              {" "}
-              <Button
-                onClick={() => setIsTasking(false)}
-                type={!isTasking ? "primary" : "default"}
-              >
-                Not talking return
-              </Button>
-              <Button
-                onClick={() => setIsTasking(true)}
-                type={isTasking ? "primary" : "default"}
-              >
-                Talking return
-              </Button>
-            </div>
-          </Form.Item>
-        </Form>
+            <Form.Item label="Type">
+              <div className=" flex gap-2 flex-col w-[45%]">
+                {" "}
+                <Button
+                  onClick={() => setIsTasking(false)}
+                  type={!isTasking ? "primary" : "default"}
+                >
+                  Not talking return
+                </Button>
+                <Button
+                  onClick={() => setIsTasking(true)}
+                  type={isTasking ? "primary" : "default"}
+                >
+                  Talking return
+                </Button>
+              </div>
+            </Form.Item>
+          </Form>
+        )}
       </Modal>
     </div>
   );
