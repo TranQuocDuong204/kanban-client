@@ -1,6 +1,11 @@
-
+import StaticComponent from "@/components/StaticComponent";
+import {
+  MoneyCollectOutlined,
+  StockOutlined,
+  FundOutlined,
+  BankOutlined,
+} from "@ant-design/icons";
 const HomeScreens = () => {
-
   // const verifyToken = async () => {
   //   // Lấy chuỗi JSON từ localStorage
   //   const tokenString = localStorage.getItem("auth");
@@ -48,9 +53,73 @@ const HomeScreens = () => {
   //   }
   // };
 
+  const saleData = [
+    {
+      key: "sale",
+      descriptions: "Sales",
+      color: "",
+      icon: <MoneyCollectOutlined />,
+      value: Math.floor(Math.random() * 10000000),
+      valueType: "currency",
+    },
+    {
+      key: "revenue",
+      descriptions: "Revenue",
+      color: "",
+      icon: <StockOutlined />,
+      value: Math.floor(Math.random() * 10000000),
+      valueType: "currency",
+    },
+    {
+      key: "profit",
+      descriptions: "Profit",
+      color: "",
+      icon: <FundOutlined />,
+      value: Math.floor(Math.random() * 10000000),
+      valueType: "currency",
+    },
+    {
+      key: "cost",
+      descriptions: "Cost",
+      color: "",
+      icon: <BankOutlined />,
+      value: Math.floor(Math.random() * 10000000),
+      valueType: "currency",
+    },
+  ];
+
+  const inventory = [
+    {
+      key: "sale",
+      descriptions: "Sales",
+      color: "",
+      icon: <MoneyCollectOutlined />,
+      value: Math.floor(Math.random() * 10000000),
+      valueType: "currency",
+    },
+    {
+      key: "revenue",
+      descriptions: "Revenue",
+      color: "",
+      icon: <StockOutlined />,
+      value: Math.floor(Math.random() * 10000000),
+      valueType: "currency",
+    },
+  ];
   return (
     <div>
-     
+      <div className="flex flex-row p-2 gap-1">
+        <div className="basis-2/3">
+          <StaticComponent title="Sale Overview" datas={saleData}>
+            left
+          </StaticComponent>
+        </div>
+        <div className="basis-1/3">
+          <StaticComponent title="Inventory Summary" datas={inventory}>
+            Inventory Summary
+          </StaticComponent>
+        </div>
+      </div>
     </div>
   );
 };

@@ -45,13 +45,14 @@ const ModalExportData = ({ visible, onClose, api, name }) => {
     }
 
     const data = checkedValue;
-    if (Object.keys(data).length > 0) {
+    if (data.length > 0) {
       setIsLoading(true);
       try {
         const res = await axios.post(url, data, {
           headers: { "Content-Type": "application/json" },
         });
-        handleExportExcel(res.data.data, "supplier.xlsx");
+        res.data.data &&
+          (await handleExportExcel(res.data.data, "supplier.xlsx"));
         setCheckedValue([]);
         setTimeSelected(false);
         onClose();
