@@ -118,7 +118,7 @@ const AddSupplier = ({ visible, onClose, onAddNew, supplier }) => {
         okText={supplier ? "Update Supplier" : "Add Supplier"}
         cancelText="Discard"
       >
-        <div className=" hidden">
+        <div className="hidden">
           <input
             ref={inputRef}
             type="file"

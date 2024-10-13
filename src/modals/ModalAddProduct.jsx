@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Form, Input, Modal } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const ModalAddProduct = ({ visible, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);

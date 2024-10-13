@@ -6,6 +6,7 @@ import { Affix, Layout } from "antd";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HeaderComponent from "@/components/HeaderComponent";
 import AddProduct from "@/screens/inventory/AddProduct";
+import Categories from "@/screens/Categories";
 // import FooterComponent from "@/components/FooterComponent";
 const { Content } = Layout;
 const MainRouter = () => {
@@ -33,6 +34,7 @@ const MainRouter = () => {
 
               <Route path="/report" element={<Report />}></Route>
               <Route path="/supplier" element={<Supplier />}></Route>
+              <Route path="/category" element={<Categories />}></Route>
               <Route path="/orders" element={<Order />}></Route>
               <Route path="/manage-store" element={<ManageStore />}></Route>
             </Routes>

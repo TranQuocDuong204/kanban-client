@@ -4,8 +4,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import TableComponent from "@/components/TableComponent";
 
-
-
 const Supplier = () => {
   const [visible, setVisible] = useState(false);
   const [suppliers, setSuppliers] = useState([]);
@@ -182,7 +180,7 @@ const Supplier = () => {
         setVisible={setVisible}
         onPageChange={setPageInfo}
         removeSupplier={(value) => {
-          removeSupplier(value)
+          removeSupplier(value);
         }}
         setSupplierSelected={setSupplierSelected}
         api={"http://localhost:8080/v1/supplier"}

@@ -7,6 +7,7 @@ import {
   UserOutlined,
   InboxOutlined,
   ProfileOutlined,
+  FileSyncOutlined
 } from "@ant-design/icons";
 import { Typography } from "antd";
 const { Sider } = Layout;
@@ -29,6 +30,11 @@ const SiderComponent = () => {
           label: <Link to={"/inventory/add-product"}>Add Product</Link>
         }
       ]
+    },
+    {
+      key: "category",
+      label: <Link to={"/category"}>Category</Link>,
+      icon: <FileSyncOutlined style={{ fontSize: 18 }}/>
     },
     {
       key: "report",
